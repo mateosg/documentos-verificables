@@ -32,6 +32,16 @@ cp "$SKILL_SOURCE" .claude/skills/documentos-verificables/SKILL.md
 
 También puede descargar `documentos-verificables.skill` como paquete distribuible. Para modificar o revisar la skill, use preferentemente el `SKILL.md` visible en el repositorio.
 
+## Configuración de este repositorio
+
+Este repositorio incluye la skill en la ruta que reconoce GitHub Copilot para skills de proyecto:
+
+```text
+.github/skills/documentos-verificables/SKILL.md
+```
+
+La copia configurada es idéntica al `SKILL.md` de la raíz. Copilot puede activarla automáticamente cuando la petición coincide con su descripción; también puede solicitarla explícitamente mencionando `documentos-verificables`.
+
 Versione la carpeta específica del ecosistema junto con el proyecto. No copie la misma skill en varias rutas del mismo agente sin entender la precedencia: podría cargarse una versión distinta de la que espera.
 
 ## Claude Code
