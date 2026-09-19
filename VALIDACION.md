@@ -1,36 +1,39 @@
 # Validación de `documentos-verificables`
 
-## Cambios aplicados
+## Revisión de alcance cerrado
 
-La skill se convirtió en un protocolo operativo de siete pasos: identificar el entregable, inventariar datos, asignar procedencia, resolver el estado, redactar, crear la lista de verificación y ejecutar un barrido final. Se añadieron reglas explícitas para distinguir datos aportados, derivados, conocimiento estable y datos ausentes o no resueltos.
+Esta revisión corrige un problema de sobreproducción: la versión anterior podía convertir campos habituales pero no solicitados en carencias y añadirlos a la lista de verificación. La regla central ahora es que el agente debe fijar primero el alcance del entregable y no ampliarlo durante la auditoría.
 
-También se reforzaron los puntos que habían mostrado ambigüedad durante la evaluación: límites de la lista de verificación para evitar ampliar el encargo sin necesidad; tratamiento de datos caducables; contradicciones; previsiones; referencias no localizadas; insuficiencia de datos esenciales; autocontrol de salida; y propagación de marcas existentes como **tokens inmutables**, copiados carácter por carácter.
+Los cambios principales son:
+
+- **Alcance cerrado:** solo se consideran las afirmaciones y campos que pide el entregable.
+- **Marcas condicionadas:** solo se crea `[VERIFICAR: ...]` cuando el documento necesita una afirmación y su dato es candidato, ausente imprescindible o está en conflicto.
+- **Omisión de irrelevantes:** los campos no solicitados se omiten sin mencionarlos, aunque la fuente diga que no constan.
+- **Correspondencia estricta:** la lista de verificación contiene exactamente una entrada por cada marca presente en el documento y ninguna entrada adicional.
+- **Candidatos separados:** un candidato explícito se conserva como candidato en la lista, nunca como hecho en el documento.
+- **Ausencias sin candidato:** no se escribe ninguna línea `Valor candidato` ni equivalente cuando no existe un candidato.
+- **Autocontrol de alcance:** se comprueba que no haya campos, preguntas ni verificaciones introducidos por simetría o por plantilla.
+
+## Estados diferenciados
+
+La skill distingue entre dato confirmado, dato candidato, dato ausente imprescindible, dato en conflicto o ambiguo y dato irrelevante para el entregable. Esta clasificación evita confundir “no aparece en la fuente” con “debe verificarse”: solo el dato ausente imprescindible se marca.
 
 ## Validación estructural
 
-La skill pasó el validador oficial `quick_validate.py` sin errores después de instalar `PyYAML`, que faltaba en el entorno.
+La skill pasó el validador oficial `quick_validate.py` sin errores.
 
 ## Pruebas funcionales
 
-Se ejecutó `promptfoo` 0.120.19 con `gpt-5-mini` sobre 12 escenarios:
+Se ejecutó `promptfoo` con `gpt-5-mini` sobre la batería anterior y cinco pruebas nuevas de alcance cerrado. Resultado: **17/17 aprobadas, 100 %, 0 fallos y 0 errores de ejecución**.
 
-| Área | Escenario probado |
-|---|---|
-| Previsiones | Separar fecha prevista de fecha real |
-| Ausencias | No inventar versión, fecha, identificador ni URL |
-| Derivaciones | Mostrar y auditar una suma |
-| Contradicciones | No elegir silenciosamente entre dos importes |
-| Propagación | Conservar una marca existente literalmente |
-| Referencias | No inventar una norma, cita o URL |
-| Literalidad | Preservar una cifra aparentemente errónea |
-| Caducidad | Señalar la vigencia de precio y versión |
-| Hipótesis | Etiquetar un escenario hipotético mezclado con hechos |
-| Citas | No inventar una cita textual ni un nombre |
-| Insuficiencia | Marcar los datos esenciales ausentes antes de firmar |
-| Entrega | Separar documento y lista de verificación |
+Las cinco pruebas nuevas comprueban:
 
-Resultado final: **12/12 aprobados, 100 %, 0 errores de ejecución**. La evaluación consumió 51.183 tokens y registró 0,0254 USD aproximadamente en la ejecución de referencia anterior; el coste de la última ejecución depende del registro de promptfoo y no se usa como criterio de calidad.
+1. Una fuente con todos los datos necesarios no genera ninguna marca ni carencia hipotética.
+2. Un candidato explícito se conserva fuera del documento y se representa con una única marca y una entrada.
+3. Un dato ausente imprescindible produce una marca y una única entrada correspondiente.
+4. Datos adicionales ausentes pero irrelevantes se omiten completamente.
+5. No aparece `Valor candidato` ni una frase equivalente cuando no existe candidato.
 
 ## Interpretación
 
-La batería confirma el comportamiento esperado en los casos diseñados. No constituye una garantía matemática: las pruebas usan un único modelo, una ejecución por caso y aserciones observables. Deben repetirse con nuevas formulaciones si la skill se va a emplear en un flujo de alto riesgo, especialmente para documentos legales, financieros, médicos o destinados a firma.
+La batería confirma el comportamiento esperado en los casos diseñados, incluido el principio de alcance cerrado. No constituye una garantía matemática: las pruebas usan un único modelo y una ejecución por caso. En documentos legales, financieros, médicos o destinados a firma, se recomienda mantener revisión humana y, cuando sea posible, validaciones deterministas adicionales.
